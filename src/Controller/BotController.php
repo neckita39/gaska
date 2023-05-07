@@ -20,9 +20,10 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 class BotController extends AbstractController
 {
 	private MessageService $messageService;
+
 	public function __construct(
 		private readonly HttpClientInterface $client,
-		private readonly MessageRepository $messageRepository
+		private readonly MessageRepository   $messageRepository
 	)
 	{
 	}
@@ -31,22 +32,24 @@ class BotController extends AbstractController
 	public function resolve(Request $request,): Response
 	{
 		$resolvedData = (new RequestResolver())->resolve($request);
-		if ($this->notForMe($resolvedData))
-		{
+		if ($this->notForMe($resolvedData)) {
 			return new JsonResponse('Not for me.');
 		}
 
 		$payloads = PayloadFactory::getPayload($resolvedData);
-		if ($payloads->isEmpty())
-		{
+		if ($payloads->isEmpty()) {
 			return new JsonResponse('Empty payloads.');
 		}
 
-//		$this->messageService = new MessageService($this->messageRepository, $resolvedData);
-//		$this->messageService->add();
+		try {
+			$this->messageService = new MessageService($this->messageRepository, $resolvedData);
+			$this->messageService->add();
+		} catch (\Exception $exception) {
+			return new JsonResponse($exception->getMessage());
+		}
 
-		foreach ($payloads as $payload)
-		{
+
+		foreach ($payloads as $payload) {
 			/** @var TelegramPayload $payload */
 			$request = new TelegramRequest($resolvedData, $payload, $this->client);
 			$request->send();
