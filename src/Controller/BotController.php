@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Internal\Messenger\Telegram\Bot\TelegramBot;
+use App\Internal\Messenger\Telegram\Item\Command\HelpCommand;
 use App\Internal\Messenger\Telegram\MessageData;
 use App\Repository\MessageRepository;
 use App\Resolve\Messenger\Telegram\RequestResolver;
@@ -60,9 +61,8 @@ class BotController extends AbstractController
 
 	private function notForMe(MessageData $messageData): bool
 	{
-		return !str_contains(
-			$messageData->getMessage()->getText(),
-			TelegramBot::getInstance()->getName()
-		);
+		return
+			!str_contains($messageData->getMessage()->getText(), TelegramBot::getInstance()->getName())
+			&& !str_contains($messageData->getMessage()->getText(), '/' . (new HelpCommand())->getText());
 	}
 }
