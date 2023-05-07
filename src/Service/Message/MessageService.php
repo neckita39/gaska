@@ -18,7 +18,7 @@ class MessageService
 
 	public function add(): self
 	{
-		$text = $this->messageData->getMessage()->getCleanText();
+		$text = $this->messageData->getMessage()->getText(false);
 		$message = new Message();
 		$message
 			->setMessage($text)
