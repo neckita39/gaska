@@ -15,9 +15,9 @@ class RequestResolver implements Resolver
 	public function resolve(Request $request): MessageData
 	{
 		$data = $request->toArray();
-		$chat = new TelegramChat($data['message']['chat']['id']);
-		$message = new TelegramMessage($data['message']['text']);
-		$user = new TelegramUser($data['message']['chat']['username'] ?? $data['message']['from']['username']);
+		$chat = new TelegramChat($data['message']['chat']['id'] ?? 0);
+		$message = new TelegramMessage($data['message']['text'] ?? '');
+		$user = new TelegramUser($data['message']['chat']['username'] ?? $data['message']['from']['username'] ?? '');
 
 		return new TelegramMessageData($chat, $message, $user);
 	}
